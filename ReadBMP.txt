@@ -1,0 +1,26 @@
+/*************************************************
+Copyright:CUG-lxl
+Author:lxl
+Date:2022-03-21
+Description:Read BMP about C++
+**************************************************/
+        unsigned char** data;
+        BITMAPFILEHEADER FileHead;//位图文件头
+        BITMAPINFOHEADER InfoHead;//位图信息头
+        RGBQUAD Color[256];//颜色点阵数据
+        fin.read((char*)&FileHead, sizeof(FileHead));//读取位图文件头
+        if (FileHead.bfType !=19778)return 0;//19778(10进制)  保证文件为BMP格式
+        fin.read((char*)&InfoHead, sizeof(InfoHead));//读取位图信息头
+        fin.read((char*)&Color, FileHead.bfOffBits - sizeof(InfoHead) - sizeof(FileHead));//读取颜色点阵数据
+        int count = InfoHead.biWidth * InfoHead.biHeight;//像素总数
+        int lineByte = (InfoHead.biWidth * InfoHead.biBitCount / 8 + 3) / 4 * 4;//一行读多少个
+        fin.seekg(FileHead.bfOffBits, 0);//定位
+
+        data = new unsigned char* [InfoHead.biHeight];
+        for (int i = 0; i < InfoHead.biHeight; i++)//像素信息存到二维数组里
+        {
+            data[i] = new unsigned char[lineByte];
+            fin.read((char*)data[i], lineByte);
+        }
+        fin.close();
+        //数据读完
